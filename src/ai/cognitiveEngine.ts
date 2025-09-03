@@ -21,9 +21,14 @@ export class CognitiveEngine {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
     
-    // Skip slow TensorFlow initialization - use instant universal classifier
+    // Initialize local AI for training data collection
+    await this.localAI.initialize();
     this.isInitialized = true;
-    console.log('⚡ Cognitive Engine: INSTANT mode activated (no training needed)');
+    console.log('⚡ Cognitive Engine: Training data collection mode activated');
+  }
+
+  getLocalAI() {
+    return this.localAI;
   }
 
   async processInput(text: string): Promise<Intent | null> {

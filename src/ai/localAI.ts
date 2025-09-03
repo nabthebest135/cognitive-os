@@ -1,11 +1,19 @@
-// Local AI Integration for Universal Question Answering
+// Temporary AI for Training Data Collection
 export class LocalAI {
   private isInitialized = false;
+  private trainingData: Array<{input: string, output: string, timestamp: string}> = [];
 
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
     this.isInitialized = true;
-    console.log('🤖 Smart AI system ready');
+    console.log('🤖 Training data collection system ready');
+    
+    // Load existing training data
+    const stored = localStorage.getItem('cos-training-data');
+    if (stored) {
+      this.trainingData = JSON.parse(stored);
+      console.log(`📊 Loaded ${this.trainingData.length} training examples`);
+    }
   }
 
   async generateResponse(userInput: string): Promise<string> {
@@ -13,8 +21,78 @@ export class LocalAI {
       await this.initialize();
     }
 
-    // Smart fallback for all questions
-    return this.smartFallback(userInput);
+    try {
+      // Try Hugging Face API (free tier)
+      const response = await this.callHuggingFaceAPI(userInput);
+      
+      // Store for training data
+      this.storeTrainingExample(userInput, response);
+      
+      return response;
+    } catch (error) {
+      console.warn('AI API failed, using fallback:', error);
+      const fallback = this.smartFallback(userInput);
+      this.storeTrainingExample(userInput, fallback);
+      return fallback;
+    }
+  }
+
+  private async callHuggingFaceAPI(input: string): Promise<string> {
+    const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Using free tier - no API key needed for basic usage
+      },
+      body: JSON.stringify({
+        inputs: input,
+        parameters: {
+          max_length: 200,
+          temperature: 0.7
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data[0]?.generated_text || this.smartFallback(input);
+  }
+
+  private storeTrainingExample(input: string, output: string): void {
+    const example = {
+      input: input.trim(),
+      output: output.trim(),
+      timestamp: new Date().toISOString()
+    };
+    
+    this.trainingData.push(example);
+    
+    // Keep only last 1000 examples
+    if (this.trainingData.length > 1000) {
+      this.trainingData = this.trainingData.slice(-1000);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('cos-training-data', JSON.stringify(this.trainingData));
+    
+    console.log(`📊 Training data: ${this.trainingData.length} examples collected`);
+  }
+
+  getTrainingData(): Array<{input: string, output: string, timestamp: string}> {
+    return this.trainingData;
+  }
+
+  exportTrainingData(): string {
+    return JSON.stringify(this.trainingData, null, 2);
+  }
+
+  clearTrainingData(): void {
+    this.trainingData = [];
+    localStorage.removeItem('cos-training-data');
+    console.log('🗑️ Training data cleared');
   }
 
   private smartFallback(input: string): string {

@@ -11,6 +11,7 @@ import AnalyticsDashboard from './components/AnalyticsDashboard';
 import PWAInstaller from './components/PWAInstaller';
 
 import PerformanceWarning from './components/PerformanceWarning';
+import TrainingDataPanel from './components/TrainingDataPanel';
 import { UniversalActionExecutor } from './actions/UniversalActionExecutor';
 import { ContextEngine } from './ai/contextEngine';
 
@@ -370,6 +371,9 @@ function App() {
         isVisible={showAnalytics}
         onClose={() => setShowAnalytics(false)}
       />
+      
+      {/* Training Data Panel */}
+      <TrainingDataPanel localAI={cognitiveEngine.getLocalAI()} />
     </div>
   );
 }
