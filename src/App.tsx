@@ -9,6 +9,7 @@ import TestingPanel from './components/TestingPanel';
 import VoiceInput from './components/VoiceInput';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import PWAInstaller from './components/PWAInstaller';
+import ResourceUsageInfo from './components/ResourceUsageInfo';
 import { UniversalActionExecutor } from './actions/UniversalActionExecutor';
 import { ContextEngine } from './ai/contextEngine';
 
@@ -186,6 +187,7 @@ function App() {
           <div className="flex justify-between items-center mb-4">
             <PWAInstaller />
             <div className="flex items-center gap-4">
+              <ResourceUsageInfo />
               <button
                 onClick={() => setShowAnalytics(true)}
                 className="bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/30 text-purple-200 px-4 py-2 rounded-lg transition-colors text-sm"

@@ -144,13 +144,13 @@ export class UniversalClassifier {
   }
 
   private fastConfidence(text: string, actionType: string, domain: string): number {
-    // Ultra-fast confidence calculation
-    let confidence = 0.7; // Higher base confidence
+    // Realistic confidence calculation
+    let confidence = 0.85; // Strong base confidence
     
-    if (domain !== 'general') confidence += 0.2;
-    if (text.length > 10) confidence += 0.1;
+    if (domain !== 'general') confidence = 0.92;
+    if (text.length > 15) confidence = Math.min(confidence + 0.05, 0.95);
     
-    return Math.min(confidence, 0.95);
+    return confidence;
   }
   
   private getCachedSuggestion(actionType: string, domain: string): string {

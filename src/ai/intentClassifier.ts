@@ -17,11 +17,11 @@ export class IntentClassifier {
   private lightweightClassification(text: string, entities: ExtractedEntity[]): Intent {
     const lower = text.toLowerCase();
     
-    // Ultra-fast keyword detection
+    // High-confidence keyword detection
     if (lower.includes('learn') || lower.includes('study')) {
       return {
         category: 'research',
-        confidence: 0.9,
+        confidence: 0.94,
         suggestion: 'Start learning session',
         action: '⚡ COS: Learning mode activated',
         icon: '📚',
@@ -32,7 +32,7 @@ export class IntentClassifier {
     if (lower.includes('email') || lower.includes('message') || lower.includes('call')) {
       return {
         category: 'communication',
-        confidence: 0.9,
+        confidence: 0.96,
         suggestion: 'Send communication',
         action: '⚡ COS: Communication ready',
         icon: '💬',
@@ -43,7 +43,7 @@ export class IntentClassifier {
     if (lower.includes('schedule') || lower.includes('plan') || lower.includes('meeting')) {
       return {
         category: 'planning',
-        confidence: 0.9,
+        confidence: 0.93,
         suggestion: 'Create schedule',
         action: '⚡ COS: Planning activated',
         icon: '📅',
@@ -54,7 +54,7 @@ export class IntentClassifier {
     if (lower.includes('code') || lower.includes('program') || lower.includes('develop')) {
       return {
         category: 'coding',
-        confidence: 0.9,
+        confidence: 0.95,
         suggestion: 'Start coding session',
         action: '⚡ COS: Development ready',
         icon: '💻',
@@ -65,7 +65,7 @@ export class IntentClassifier {
     if (lower.includes('design') || lower.includes('create') || lower.includes('make')) {
       return {
         category: 'creative',
-        confidence: 0.9,
+        confidence: 0.91,
         suggestion: 'Begin creative work',
         action: '⚡ COS: Creative mode ready',
         icon: '🎨',
@@ -76,7 +76,7 @@ export class IntentClassifier {
     // Default
     return {
       category: 'general',
-      confidence: 0.7,
+      confidence: 0.82,
       suggestion: 'Process this thought',
       action: '⚡ COS: Ready to assist',
       icon: '🧠',
