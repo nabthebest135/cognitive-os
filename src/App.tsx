@@ -359,7 +359,7 @@ function App() {
         <div className="text-center mt-12 text-green-400/40">
           <p className="flex items-center justify-center gap-2">
             <Brain className="w-4 h-4" />
-            Cognitive OS - The Future of Personal AI | Built by Nabhan
+            Cognitive OS - The Future of Personal AI | Built by <a href="https://github.com/nabthebest135" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 underline">Nabhan</a>
           </p>
           <p className="text-xs mt-2">
             Proactive Intelligence • Voice Commands • Context Awareness • Complete Privacy
