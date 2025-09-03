@@ -18,14 +18,9 @@ export class CognitiveEngine {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
     
-    try {
-      await this.intentClassifier.initialize();
-      this.isInitialized = true;
-      console.log('🧠 Cognitive Engine initialized successfully');
-    } catch (error) {
-      console.error('Failed to initialize Cognitive Engine:', error);
-      this.isInitialized = true; // Use fallback mode
-    }
+    // Skip slow TensorFlow initialization - use instant universal classifier
+    this.isInitialized = true;
+    console.log('⚡ Cognitive Engine: INSTANT mode activated (no training needed)');
   }
 
   async processInput(text: string): Promise<Intent | null> {
@@ -33,16 +28,15 @@ export class CognitiveEngine {
     
     console.log('🔍 CognitiveEngine processing:', text);
     
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
+    // No initialization needed - instant response
 
     try {
+      const startTime = performance.now();
+      
       // Extract entities first
       const entities = this.entityExtractor.extractEntities(text);
-      console.log('🏷️ Entities extracted:', entities);
       
-      // Use universal classifier for infinite domain coverage
+      // Use ONLY universal classifier (bypass slow TensorFlow)
       const universalAction = this.universalClassifier.classifyUniversalIntent(text, entities);
       
       // Convert to Intent format
@@ -56,7 +50,8 @@ export class CognitiveEngine {
         domain: universalAction.domain
       };
       
-      console.log(`🎯 Universal classification: ${universalAction.actionType} in ${universalAction.domain} domain`);
+      const endTime = performance.now();
+      console.log(`⚡ INSTANT: ${(endTime - startTime).toFixed(1)}ms - ${universalAction.actionType} in ${universalAction.domain}`);
       
       return intent;
     } catch (error) {

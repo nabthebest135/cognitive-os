@@ -109,55 +109,36 @@ export class UniversalClassifier {
   }
 
   private fastParallelDetection(text: string, entities: ExtractedEntity[]): ['create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize', string] {
-    // Ultra-fast keyword matching with early exit
-    let actionType: 'create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize' = 'create';
-    let domain = 'general';
+    // INSTANT single-pass detection
+    let actionType: 'create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize';
     
-    // Priority keywords for instant detection
-    if (text.includes('email') || text.includes('message') || text.includes('call')) {
-      actionType = 'communicate';
-    } else if (text.includes('schedule') || text.includes('plan') || text.includes('meeting')) {
-      actionType = 'schedule';
-    } else if (text.includes('study') || text.includes('learn') || text.includes('research')) {
-      actionType = 'learn';
-    } else if (text.includes('create') || text.includes('make') || text.includes('build')) {
-      actionType = 'create';
-    } else if (text.includes('analyze') || text.includes('review') || text.includes('check')) {
-      actionType = 'analyze';
-    } else if (text.includes('organize') || text.includes('sort') || text.includes('manage')) {
-      actionType = 'organize';
-    }
+    // Instant action detection
+    if (text.includes('learn')) actionType = 'learn';
+    else if (text.includes('email') || text.includes('message')) actionType = 'communicate';
+    else if (text.includes('schedule') || text.includes('plan')) actionType = 'schedule';
+    else if (text.includes('create') || text.includes('make')) actionType = 'create';
+    else if (text.includes('analyze') || text.includes('review')) actionType = 'analyze';
+    else if (text.includes('organize') || text.includes('sort')) actionType = 'organize';
+    else actionType = 'create'; // default
     
-    // Fast domain detection with entity priority
-    const topicEntity = entities.find(e => e.type === 'topic');
-    if (topicEntity) {
-      domain = this.fastDomainMatch(topicEntity.value.toLowerCase());
-    } else {
-      domain = this.fastDomainMatch(text);
-    }
+    // Instant domain detection
+    const domain = this.fastDomainMatch(text);
     
     return [actionType, domain];
   }
 
   private fastDomainMatch(text: string): string {
-    // Ultra-fast domain detection with priority matching
-    const priorityDomains = {
-      'programming': ['code', 'javascript', 'python', 'react', 'api'],
-      'fitness': ['workout', 'exercise', 'gym', 'training'],
-      'cooking': ['recipe', 'food', 'kitchen', 'meal'],
-      'music': ['song', 'instrument', 'band', 'concert'],
-      'sports': ['game', 'team', 'match', 'tournament'],
-      'design': ['design', 'logo', 'ui', 'graphics'],
-      'business': ['business', 'startup', 'company', 'strategy'],
-      'travel': ['travel', 'trip', 'vacation', 'flight'],
-      'photography': ['photo', 'camera', 'picture', 'image']
-    };
-    
-    for (const [domain, keywords] of Object.entries(priorityDomains)) {
-      if (keywords.some(keyword => text.includes(keyword))) {
-        return domain;
-      }
-    }
+    // INSTANT domain detection - single pass
+    if (text.includes('guitar') || text.includes('piano') || text.includes('music') || text.includes('song')) return 'music';
+    if (text.includes('code') || text.includes('programming') || text.includes('javascript')) return 'programming';
+    if (text.includes('workout') || text.includes('fitness') || text.includes('gym')) return 'fitness';
+    if (text.includes('recipe') || text.includes('cooking') || text.includes('food')) return 'cooking';
+    if (text.includes('photo') || text.includes('camera') || text.includes('picture')) return 'photography';
+    if (text.includes('travel') || text.includes('trip') || text.includes('vacation')) return 'travel';
+    if (text.includes('design') || text.includes('logo') || text.includes('ui')) return 'design';
+    if (text.includes('business') || text.includes('startup') || text.includes('company')) return 'business';
+    if (text.includes('game') || text.includes('gaming') || text.includes('esports')) return 'gaming';
+    if (text.includes('health') || text.includes('wellness') || text.includes('medical')) return 'health';
     
     return 'general';
   }
@@ -173,21 +154,16 @@ export class UniversalClassifier {
   }
   
   private getCachedSuggestion(actionType: string, domain: string): string {
-    // Pre-cached suggestions for instant response
-    const suggestions = {
-      'create_programming': 'Create new coding project',
-      'create_fitness': 'Create workout plan',
-      'create_cooking': 'Create recipe plan',
-      'learn_programming': 'Start coding tutorial',
-      'learn_fitness': 'Learn exercise techniques',
-      'schedule_general': 'Schedule new event',
-      'communicate_general': 'Send message',
-      'analyze_general': 'Analyze information',
-      'organize_general': 'Organize content'
-    };
+    // INSTANT pre-cached suggestions
+    if (actionType === 'learn' && domain === 'music') return 'Start guitar learning session';
+    if (actionType === 'learn' && domain === 'programming') return 'Begin coding tutorial';
+    if (actionType === 'create' && domain === 'fitness') return 'Create workout plan';
+    if (actionType === 'schedule') return 'Schedule new event';
+    if (actionType === 'communicate') return 'Send message';
+    if (actionType === 'analyze') return 'Analyze information';
+    if (actionType === 'organize') return 'Organize content';
     
-    const key = `${actionType}_${domain}`;
-    return suggestions[key as keyof typeof suggestions] || `${actionType} ${domain} content`;
+    return `${actionType} ${domain} content`;
   }
 
   private generateSuggestion(actionType: string, domain: string, originalText: string): string {
