@@ -122,6 +122,22 @@ export class UniversalActionExecutor {
   }
 
   private generateCreativeContent(domain: string, userInput: string): string {
+    // Detect specific creative requests and provide rich content
+    const lowerInput = userInput.toLowerCase();
+    
+    if (lowerInput.includes('roleplay') || lowerInput.includes('scenario')) {
+      return this.generateRoleplayScenarios();
+    }
+    
+    if (lowerInput.includes('story') || lowerInput.includes('writing')) {
+      return this.generateStoryIdeas();
+    }
+    
+    if (lowerInput.includes('game') || lowerInput.includes('activity')) {
+      return this.generateGameIdeas();
+    }
+    
+    // Domain-specific templates
     const templates = {
       programming: `# ${domain} Project Plan\n\n## Overview\n${userInput}\n\n## Technical Stack\n- Choose appropriate framework\n- Set up development environment\n- Plan architecture\n\n## Next Steps\n1. Initialize repository\n2. Set up basic structure\n3. Begin implementation`,
       
@@ -236,6 +252,232 @@ END:VCALENDAR`;
       subject: `${domain} Update: ${userInput.substring(0, 30)}...`,
       body: `Hi,\n\nI wanted to update you regarding ${domain}: ${userInput}\n\nPlease let me know your thoughts.\n\nBest regards,\n[Your name]`
     };
+  }
+
+  private generateRoleplayScenarios(): string {
+    return `# 🎭 Roleplay Scenarios Collection
+
+Here are engaging roleplay scenarios across different genres to spark your imagination:
+
+## 🏰 Fantasy & Adventure
+
+### The Dragon's Pact
+You are a seasoned adventurer who has stumbled upon a dragon's hoard. However, the dragon isn't what you expected—it's ancient, wise, and more interested in a bargain than a fight. What does it want, and what are you willing to trade?
+
+### The Fallen Kingdom
+You are the last surviving member of a royal family, hiding in exile after your kingdom was overthrown. The time has come to reclaim your throne, but you must unite disparate, distrustful factions and confront the sorcerer who seized power.
+
+### Guardians of the Forest
+You belong to a mystical order tasked with protecting a sacred, ancient forest from a creeping blight. The blight isn't natural—it's caused by a mysterious force, and you must work with unlikely allies to stop it.
+
+## 🚀 Sci-Fi & Dystopian
+
+### The Last Signal
+In a desolate, post-apocalyptic world, you are a scavenger searching for resources. One day, you pick up a clear radio signal—the first human voice you've heard in years, coming from a location that shouldn't be habitable.
+
+### Mind Heist
+You are a skilled "mind-diver," a specialist who can enter and navigate the subconscious minds of others. Your latest job is to extract critical information from a powerful corporate CEO's mind, but it's heavily guarded with dangerous traps.
+
+### First Contact
+You are a crew member on a deep space exploration vessel that has discovered an alien signal. You've been chosen to make first diplomatic contact, but the alien species communicates in ways you've never encountered.
+
+## 🕵️ Modern & Mystery
+
+### The Missing Heiress
+A wealthy socialite has vanished without a trace, and you are the detective hired to find her. The family is full of secrets, the last person to see her is uncooperative, and every clue leads to more questions.
+
+### A Second Chance
+You are a former criminal just released from prison, trying to go straight. Your old crew has tracked you down and wants you for "one last job." Do you risk your new life to help them?
+
+### The Mysterious Artifact
+While cleaning your grandmother's attic, you discover an intricately carved box containing a mysterious artifact that seems to affect the world around you in subtle, strange ways.
+
+## 🎪 Light & Fun
+
+### The Time Loop Café
+You work at a small café where, inexplicably, the same hour repeats every day. Only you seem to notice. How do you use this knowledge?
+
+### Superhero in Training
+You've just discovered you have superpowers, but they're... unconventional. Maybe you can talk to houseplants, or you're incredibly lucky with parking spaces. How do you become a hero?
+
+### The Magical Pet Shop
+You inherit a pet shop from a mysterious relative, only to discover that all the "pets" are actually magical creatures in disguise.
+
+## 💡 Tips for Great Roleplay
+
+- **Start with character motivation**: What does your character want?
+- **Embrace conflict**: Tension makes stories interesting
+- **Say "yes, and..."**: Build on ideas rather than shutting them down
+- **Focus on relationships**: How characters interact drives the story
+- **Don't be afraid to fail**: Failure often leads to the best stories
+
+## 🎲 Quick Scenario Generator
+
+Combine elements from different categories:
+- **Setting**: Medieval village, Space station, Modern city, Magical realm
+- **Conflict**: Missing person, Ancient curse, Corporate conspiracy, Alien invasion
+- **Twist**: Nothing is as it seems, Time is running out, Someone is lying, Magic is real
+
+---
+*Generated by Cognitive OS - Your Creative AI Assistant*`;
+  }
+
+  private generateStoryIdeas(): string {
+    return `# ✍️ Story Ideas & Writing Prompts
+
+## 📖 Short Story Concepts
+
+### The Memory Thief
+In a world where memories can be extracted and sold, you discover that someone has been stealing your childhood memories. But when you track them down, you realize they had a good reason.
+
+### The Last Library
+Books are now illegal, and you are the secret keeper of the world's last library, hidden beneath a coffee shop. When a government inspector becomes suspicious, you must decide whether to trust them.
+
+### Digital Ghosts
+After your best friend dies, you start receiving messages from their social media accounts. At first, you think someone is playing a cruel joke, but the messages contain information only your friend could know.
+
+## 🌟 Character-Driven Stories
+
+### The Substitute Teacher
+A mysterious substitute teacher appears at different schools, always for exactly one day, and always manages to change one student's life forever. Who are they, and what's their mission?
+
+### The Night Shift
+Working the night shift at a 24-hour diner, you've seen it all. But tonight, the same customer keeps coming in every hour, each time looking slightly different and claiming it's their first visit.
+
+### The Inheritance
+You inherit a house from a great-aunt you never met, but the inheritance comes with an unusual condition: you must live in the house for exactly one year, and you cannot change anything about it.
+
+## 🔮 Speculative Fiction
+
+### The Emotion Market
+In the future, emotions can be bottled and sold. You work as an "emotion harvester," but you've just discovered that the company is harvesting emotions from people without their consent.
+
+### The Backup Planet
+Humanity has a backup planet in case Earth becomes uninhabitable. You're part of the advance team sent to prepare it, but you discover that the planet isn't as empty as everyone thought.
+
+### The Algorithm
+An AI designed to predict human behavior becomes so accurate that it starts influencing the very behaviors it's supposed to predict. You're the programmer who created it, and now you must decide whether to shut it down.
+
+## 💝 Romance & Relationships
+
+### The Time Traveler's Dilemma
+You can travel through time, but only to moments in your own past. You use this ability to try to fix your relationship, but every change you make seems to make things worse.
+
+### The Matchmaker's Curse
+You have an uncanny ability to set up perfect couples, but you can never find love yourself. When you finally meet someone special, you discover they're immune to your matchmaking abilities.
+
+### Letters to the Future
+You and your partner write letters to each other to be opened in 10 years. When the time comes, you discover that the letters reveal secrets that change everything.
+
+## 🎭 Writing Exercises
+
+1. **The Object**: Write a story centered around a single object that passes through multiple hands
+2. **The Conversation**: Write a story told entirely through dialogue
+3. **The Reversal**: Start with the ending and work backwards
+4. **The Constraint**: Write a story without using the letter 'e' (or any letter you choose)
+5. **The Perspective**: Tell the same event from three different viewpoints
+
+---
+*Generated by Cognitive OS - Your Creative Writing Assistant*`;
+  }
+
+  private generateGameIdeas(): string {
+    return `# 🎮 Game Ideas & Activities
+
+## 🏠 Indoor Games
+
+### Creative Challenges
+- **Story Building**: Each person adds one sentence to create a collaborative story
+- **Character Creation**: Design and roleplay original characters with unique quirks
+- **Improv Theater**: Act out random scenarios with no script
+- **Mystery Box**: Guess what's in the box using only yes/no questions
+
+### Mind Games
+- **20 Questions Plus**: Classic game with themed categories
+- **Word Association Chain**: See how far you can go before repeating
+- **Riddle Tournament**: Create and solve original riddles
+- **Memory Palace**: Build and test elaborate memory challenges
+
+## 🌳 Outdoor Adventures
+
+### Exploration Games
+- **Urban Scavenger Hunt**: Find specific items or locations in your city
+- **Nature Photography Challenge**: Capture specific themes or subjects
+- **Geocaching Adventure**: Use GPS to find hidden treasures
+- **Historical Walking Tour**: Research and visit local historical sites
+
+### Active Games
+- **Parkour Training**: Learn basic parkour moves safely
+- **Obstacle Course Design**: Create and time custom obstacle courses
+- **Team Challenges**: Collaborative problem-solving activities
+- **Adventure Racing**: Combine multiple activities into a race
+
+## 🎲 Party Games
+
+### Social Games
+- **Two Truths and a Lie**: Classic with creative twists
+- **Would You Rather**: Extreme edition with impossible choices
+- **Charades Evolution**: Add themes, time limits, or team challenges
+- **Human Bingo**: Find people who match specific criteria
+
+### Creative Games
+- **Pictionary Plus**: Draw with your non-dominant hand or eyes closed
+- **Song Association**: Connect songs through lyrics or themes
+- **Accent Challenge**: Speak in different accents or languages
+- **Compliment Battle**: Competitive complimenting
+
+## 🧩 Puzzle & Strategy
+
+### Brain Teasers
+- **Escape Room at Home**: Design puzzles for others to solve
+- **Logic Grid Puzzles**: Create custom logic problems
+- **Code Breaking**: Invent and crack secret codes
+- **Pattern Recognition**: Design visual or numerical patterns
+
+### Strategy Games
+- **Resource Management**: Allocate limited resources to achieve goals
+- **Negotiation Games**: Practice diplomacy and deal-making
+- **Territory Control**: Strategic games using maps or boards
+- **Economic Simulation**: Manage virtual businesses or economies
+
+## 🎨 Creative Activities
+
+### Art & Design
+- **Collaborative Art**: Multiple people work on the same piece
+- **Style Mimicry**: Recreate famous artworks in different styles
+- **Random Art Challenge**: Use random objects as art supplies
+- **Digital Art Battle**: Create art using only phone apps
+
+### Performance
+- **Talent Show**: Showcase unique or silly talents
+- **Comedy Roast**: Gentle, fun roasting of friends
+- **Dance Battle**: Learn and perform different dance styles
+- **Voice Acting**: Perform scenes with different character voices
+
+## 🌐 Digital Games
+
+### Online Multiplayer
+- **Virtual Escape Rooms**: Solve puzzles together online
+- **Online Trivia**: Custom trivia about your friend group
+- **Collaborative Playlists**: Build themed music playlists together
+- **Virtual Tours**: Explore museums or landmarks online together
+
+### App-Based Games
+- **Photo Challenges**: Use apps to create themed photo contests
+- **Fitness Challenges**: Gamify exercise with tracking apps
+- **Learning Games**: Educational apps made competitive
+- **Creative Apps**: Use drawing or music apps for challenges
+
+## 🎯 Quick Game Ideas
+
+- **60-Second Challenges**: Do as much as possible in one minute
+- **Alphabet Games**: Go through the alphabet with themed words
+- **Number Games**: Mathematical or counting challenges
+- **Color Games**: Activities based on specific colors
+- **Time Period Games**: Act like you're in different historical eras
+
+---
+*Generated by Cognitive OS - Your Entertainment AI Assistant*`;
   }
 
   private downloadFile(content: string, filename: string, mimeType: string, purpose?: string): void {
