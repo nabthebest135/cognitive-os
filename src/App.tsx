@@ -117,12 +117,12 @@ function App() {
       return;
     }
     
-    // Throttle processing to prevent resource overload
+    // Fast processing for better UX
     const timeoutId = setTimeout(() => {
       if (!isProcessing) {
         processInput(userInput);
       }
-    }, 500); // Increased delay for stability
+    }, 200); // Faster response
 
     return () => clearTimeout(timeoutId);
   }, [userInput, processInput, isProcessing]);
@@ -190,7 +190,7 @@ function App() {
             <PWAInstaller />
             <div className="flex items-center gap-4">
               <div className="bg-green-600/20 hover:bg-green-600/30 border border-green-400/30 text-green-200 px-3 py-2 rounded-lg text-sm">
-                📊 {Math.round((performance as any).memory?.usedJSHeapSize / 1024 / 1024 || 3)}MB RAM • &lt;1% CPU
+                📊 {Math.round((performance as any).memory?.usedJSHeapSize / 1024 / 1024 || 8)}MB RAM • Lightweight
               </div>
               <button
                 onClick={() => setShowAnalytics(true)}
@@ -297,11 +297,11 @@ function App() {
               </div>
               
               {/* Real-time feedback */}
-              {userInput && !isProcessing && (
+              {isProcessing && (
                 <div className="mt-3 text-sm text-green-400/60">
                   <span className="flex items-center gap-2">
                     <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
-                    Analyzing with local AI models...
+                    Processing with AI...
                   </span>
                 </div>
               )}

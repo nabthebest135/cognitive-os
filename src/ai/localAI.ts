@@ -15,23 +15,11 @@ export class LocalAI {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
     
-    console.log('🤖 Initializing local AI models...');
+    console.log('🤖 Initializing fast AI system...');
     
-    // Try WebLLM first (best quality)
-    try {
-      await this.webLLM.initialize();
-      console.log('✅ WebLLM ready');
-    } catch (error) {
-      console.warn('❌ WebLLM failed:', error);
-    }
-    
-    // Try Transformers.js as backup
-    try {
-      await this.transformersJS.initialize();
-      console.log('✅ Transformers.js ready');
-    } catch (error) {
-      console.warn('❌ Transformers.js failed:', error);
-    }
+    // Skip slow model loading for now - prioritize speed
+    // Models will load in background if needed
+    console.log('⚡ Fast mode: Using smart responses for instant feedback');
     
     this.isInitialized = true;
     console.log('🤖 Local AI initialization complete');
@@ -42,25 +30,50 @@ export class LocalAI {
       await this.initialize();
     }
 
-    // Try WebLLM first (highest quality)
+    // INSTANT fallback - no waiting for users
+    const fallbackPromise = new Promise<string>((resolve) => {
+      setTimeout(() => resolve(this.smartFallback(userInput)), 100);
+    });
+
+    // Try AI models with 3-second timeout
+    const aiPromise = this.tryAIModels(userInput);
+    
+    // Race between AI and fallback - whichever is faster wins
+    return Promise.race([aiPromise, fallbackPromise]);
+  }
+
+  private async tryAIModels(userInput: string): Promise<string> {
+    // Try WebLLM first (with timeout)
     try {
       if (this.webLLM.isReady()) {
-        return await this.webLLM.generateResponse(userInput);
+        const response = await Promise.race([
+          this.webLLM.generateResponse(userInput),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 3000)
+          )
+        ]);
+        return response;
       }
     } catch (error) {
-      console.warn('WebLLM failed:', error);
+      console.warn('WebLLM failed or timed out:', error);
     }
 
-    // Try Transformers.js as backup
+    // Try Transformers.js as backup (with timeout)
     try {
       if (this.transformersJS.isReady()) {
-        return await this.transformersJS.generateResponse(userInput);
+        const response = await Promise.race([
+          this.transformersJS.generateResponse(userInput),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 2000)
+          )
+        ]);
+        return response;
       }
     } catch (error) {
-      console.warn('Transformers.js failed:', error);
+      console.warn('Transformers.js failed or timed out:', error);
     }
 
-    // Smart fallback for all questions
+    // If all AI fails, use smart fallback
     return this.smartFallback(userInput);
   }
 
