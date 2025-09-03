@@ -17,7 +17,7 @@ This isn't just another AI assistant—it's a **Cognitive Operating System** tha
 
 ## 🚀 Try It Live
 
-**[🌐 Launch Cognitive OS →](https://your-username.github.io/cognitive-os)**
+**[🌐 Launch Cognitive OS →](https://nabthebest135.github.io/cognitive-os)**
 
 ### Quick Demo
 1. Type: `"study for chemistry exam"`
@@ -99,7 +99,7 @@ Click "Start Demo" to see automated testing of all AI capabilities:
 
 ### For Developers
 ```bash
-git clone https://github.com/your-username/cognitive-os.git
+git clone https://github.com/nabthebest135/cognitive-os.git
 cd cognitive-os
 npm install
 npm run dev
