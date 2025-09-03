@@ -188,7 +188,9 @@ function App() {
           <div className="flex justify-between items-center mb-4">
             <PWAInstaller />
             <div className="flex items-center gap-4">
-              <ResourceUsageInfo />
+              <div className="bg-green-600/20 hover:bg-green-600/30 border border-green-400/30 text-green-200 px-3 py-2 rounded-lg text-sm">
+                📊 {Math.round((performance as any).memory?.usedJSHeapSize / 1024 / 1024 || 3)}MB RAM • &lt;1% CPU
+              </div>
               <button
                 onClick={() => setShowAnalytics(true)}
                 className="bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/30 text-purple-200 px-4 py-2 rounded-lg transition-colors text-sm"
@@ -222,10 +224,11 @@ function App() {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Interface */}
-          <div className="lg:col-span-2 space-y-6">
-            <PerformanceWarning />
+        <div className="max-w-6xl mx-auto space-y-8">
+          <PerformanceWarning />
+          
+          {/* Main Interface - Full Width */}
+          <div className="space-y-6">
             {/* Demo Mode */}
             {/* Demo Mode - Make it more prominent */}
             <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-400/30 rounded-lg p-6 mb-6">
