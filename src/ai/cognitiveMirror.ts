@@ -28,6 +28,10 @@ export class CognitiveMirror {
   }
 
   private watchDocumentTitle(): void {
+    // Check title immediately
+    this.analyzeContext(document.title);
+    
+    // Watch for changes
     const observer = new MutationObserver(() => {
       const newTitle = document.title;
       if (newTitle !== this.currentContext) {
@@ -43,6 +47,9 @@ export class CognitiveMirror {
   }
 
   private watchURLChanges(): void {
+    // Analyze current URL immediately
+    this.analyzeContext(window.location.href);
+    
     let currentURL = window.location.href;
     
     setInterval(() => {
@@ -82,14 +89,65 @@ export class CognitiveMirror {
     });
   }
 
-  private analyzeContext(context: string): void {
+  private async analyzeContext(context: string): Promise<void> {
     console.log('🪞 Context detected:', context);
     
-    const predictions = this.predictNeeds(context);
-    this.predictions = predictions;
+    // Use AI to analyze context and generate better predictions
+    const aiPredictions = await this.getAIPredictions(context);
+    const rulePredictions = this.predictNeeds(context);
+    
+    // Combine AI and rule-based predictions
+    const allPredictions = [...new Set([...aiPredictions, ...rulePredictions])];
+    this.predictions = allPredictions;
     
     // Trigger proactive suggestions
-    this.triggerProactiveSuggestions(predictions);
+    if (allPredictions.length > 0) {
+      this.triggerProactiveSuggestions(allPredictions);
+    }
+  }
+
+  private async getAIPredictions(context: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-large', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_HF_API_KEY || 'hf_demo'}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          inputs: `Based on this context: "${context}", what would the user likely need next? Suggest 3 specific actions.`,
+          parameters: {
+            max_new_tokens: 100,
+            temperature: 0.7
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const aiResponse = data[0]?.generated_text || '';
+        
+        // Extract actionable suggestions from AI response
+        return this.extractActionsFromAI(aiResponse);
+      }
+    } catch (error) {
+      console.warn('AI prediction failed:', error);
+    }
+    
+    return [];
+  }
+
+  private extractActionsFromAI(aiResponse: string): string[] {
+    // Extract actionable items from AI response
+    const actions: string[] = [];
+    
+    if (aiResponse.includes('template')) actions.push('Generate templates');
+    if (aiResponse.includes('plan')) actions.push('Create action plan');
+    if (aiResponse.includes('guide')) actions.push('Download guide');
+    if (aiResponse.includes('checklist')) actions.push('Create checklist');
+    if (aiResponse.includes('notes')) actions.push('Generate notes');
+    
+    return actions.slice(0, 3); // Max 3 suggestions
   }
 
   private predictNeeds(context: string): string[] {
