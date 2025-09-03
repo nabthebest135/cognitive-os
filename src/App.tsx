@@ -166,6 +166,7 @@ function App() {
         
         // Clear input after action
         setUserInput('');
+        setCurrentIntent(null);
       } catch (error) {
         console.error('Action execution failed:', error);
         setShowConfirmation('❌ Action execution failed');
@@ -272,9 +273,20 @@ function App() {
                   {userInput.trim() && !isProcessing && (
                     <button
                       onClick={() => processInput(userInput)}
-                      className="bg-cyan-600 hover:bg-cyan-500 text-white px-2 py-1 rounded text-xs"
+                      className="bg-cyan-600 hover:bg-cyan-500 text-white px-2 py-1 rounded text-xs mr-2"
                     >
                       Analyze
+                    </button>
+                  )}
+                  {userInput.trim() && (
+                    <button
+                      onClick={() => {
+                        setUserInput('');
+                        setCurrentIntent(null);
+                      }}
+                      className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Clear
                     </button>
                   )}
                 </div>
@@ -316,11 +328,7 @@ function App() {
               insights={insights} 
               proactiveSuggestions={proactiveSuggestions}
             />
-            <TestingPanel 
-              preferences={preferences}
-              currentIntent={currentIntent}
-              processingTime={processingTime}
-            />
+
           </div>
         </div>
 

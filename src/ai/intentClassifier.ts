@@ -22,7 +22,7 @@ export class IntentClassifier {
       return {
         category: 'research',
         confidence: 0.94,
-        suggestion: 'Start learning session',
+        suggestion: 'Download study plan & resources',
         action: '⚡ COS: Learning mode activated',
         icon: '📚',
         entities
@@ -33,7 +33,7 @@ export class IntentClassifier {
       return {
         category: 'communication',
         confidence: 0.96,
-        suggestion: 'Send communication',
+        suggestion: 'Open email draft',
         action: '⚡ COS: Communication ready',
         icon: '💬',
         entities
@@ -44,7 +44,7 @@ export class IntentClassifier {
       return {
         category: 'planning',
         confidence: 0.93,
-        suggestion: 'Create schedule',
+        suggestion: 'Download calendar event',
         action: '⚡ COS: Planning activated',
         icon: '📅',
         entities
@@ -55,7 +55,7 @@ export class IntentClassifier {
       return {
         category: 'coding',
         confidence: 0.95,
-        suggestion: 'Start coding session',
+        suggestion: 'Download project setup',
         action: '⚡ COS: Development ready',
         icon: '💻',
         entities
@@ -66,7 +66,7 @@ export class IntentClassifier {
       return {
         category: 'creative',
         confidence: 0.91,
-        suggestion: 'Begin creative work',
+        suggestion: 'Download creative brief',
         action: '⚡ COS: Creative mode ready',
         icon: '🎨',
         entities
@@ -77,7 +77,7 @@ export class IntentClassifier {
     return {
       category: 'general',
       confidence: 0.82,
-      suggestion: 'Process this thought',
+      suggestion: 'Generate helpful content',
       action: '⚡ COS: Ready to assist',
       icon: '🧠',
       entities
