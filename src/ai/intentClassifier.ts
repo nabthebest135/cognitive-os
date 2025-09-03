@@ -1,6 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import { Intent, ExtractedEntity } from '../types';
 import { TRAINING_DATA, INTENT_LABELS, LABEL_TO_INDEX } from './trainingData';
+import { MEGA_TRAINING_DATA, MEGA_DOMAINS, MEGA_ACTIONS } from './megaTrainingData';
 
 export class IntentClassifier {
   private model: tf.LayersModel | null = null;

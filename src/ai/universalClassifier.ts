@@ -81,21 +81,22 @@ export class UniversalClassifier {
   };
 
   classifyUniversalIntent(text: string, entities: ExtractedEntity[]): UniversalAction {
+    const startTime = performance.now();
     const lowerText = text.toLowerCase();
     
-    // Detect action type
-    const actionType = this.detectActionType(lowerText);
+    // Ultra-fast parallel detection
+    const [actionType, domain] = this.fastParallelDetection(lowerText, entities);
     
-    // Detect domain
-    const domain = this.detectDomain(lowerText, entities);
+    // Quick confidence calculation
+    const confidence = this.fastConfidence(lowerText, actionType, domain);
     
-    // Calculate confidence
-    const confidence = this.calculateConfidence(lowerText, actionType, domain);
-    
-    // Generate suggestion and action
-    const suggestion = this.generateSuggestion(actionType, domain, text);
-    const action = this.generateAction(actionType, domain);
+    // Pre-cached suggestions
+    const suggestion = this.getCachedSuggestion(actionType, domain);
+    const action = `🧠 COS: ${actionType} system ready for ${domain}`;
     const icon = this.getIcon(actionType, domain);
+    
+    const endTime = performance.now();
+    console.log(`⚡ Classification: ${(endTime - startTime).toFixed(1)}ms`);
     
     return {
       actionType,
@@ -107,69 +108,86 @@ export class UniversalClassifier {
     };
   }
 
-  private detectActionType(text: string): 'create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize' {
-    let maxScore = 0;
-    let bestAction: 'create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize' = 'create';
+  private fastParallelDetection(text: string, entities: ExtractedEntity[]): ['create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize', string] {
+    // Ultra-fast keyword matching with early exit
+    let actionType: 'create' | 'schedule' | 'learn' | 'communicate' | 'analyze' | 'organize' = 'create';
+    let domain = 'general';
     
-    for (const [action, keywords] of Object.entries(this.actionPatterns)) {
-      const score = keywords.reduce((sum, keyword) => {
-        return sum + (text.includes(keyword) ? 1 : 0);
-      }, 0);
-      
-      if (score > maxScore) {
-        maxScore = score;
-        bestAction = action as typeof bestAction;
-      }
+    // Priority keywords for instant detection
+    if (text.includes('email') || text.includes('message') || text.includes('call')) {
+      actionType = 'communicate';
+    } else if (text.includes('schedule') || text.includes('plan') || text.includes('meeting')) {
+      actionType = 'schedule';
+    } else if (text.includes('study') || text.includes('learn') || text.includes('research')) {
+      actionType = 'learn';
+    } else if (text.includes('create') || text.includes('make') || text.includes('build')) {
+      actionType = 'create';
+    } else if (text.includes('analyze') || text.includes('review') || text.includes('check')) {
+      actionType = 'analyze';
+    } else if (text.includes('organize') || text.includes('sort') || text.includes('manage')) {
+      actionType = 'organize';
     }
     
-    return bestAction;
+    // Fast domain detection with entity priority
+    const topicEntity = entities.find(e => e.type === 'topic');
+    if (topicEntity) {
+      domain = this.fastDomainMatch(topicEntity.value.toLowerCase());
+    } else {
+      domain = this.fastDomainMatch(text);
+    }
+    
+    return [actionType, domain];
   }
 
-  private detectDomain(text: string, entities: ExtractedEntity[]): string {
-    let maxScore = 0;
-    let bestDomain = 'general';
+  private fastDomainMatch(text: string): string {
+    // Ultra-fast domain detection with priority matching
+    const priorityDomains = {
+      'programming': ['code', 'javascript', 'python', 'react', 'api'],
+      'fitness': ['workout', 'exercise', 'gym', 'training'],
+      'cooking': ['recipe', 'food', 'kitchen', 'meal'],
+      'music': ['song', 'instrument', 'band', 'concert'],
+      'sports': ['game', 'team', 'match', 'tournament'],
+      'design': ['design', 'logo', 'ui', 'graphics'],
+      'business': ['business', 'startup', 'company', 'strategy'],
+      'travel': ['travel', 'trip', 'vacation', 'flight'],
+      'photography': ['photo', 'camera', 'picture', 'image']
+    };
     
-    // Check entity topics first
-    const topicEntities = entities.filter(e => e.type === 'topic');
-    if (topicEntities.length > 0) {
-      const entityTopic = topicEntities[0].value.toLowerCase();
-      for (const [domain, keywords] of Object.entries(this.domainKeywords)) {
-        if (keywords.some(keyword => entityTopic.includes(keyword))) {
-          return domain;
-        }
+    for (const [domain, keywords] of Object.entries(priorityDomains)) {
+      if (keywords.some(keyword => text.includes(keyword))) {
+        return domain;
       }
     }
     
-    // Check text for domain keywords
-    for (const [domain, keywords] of Object.entries(this.domainKeywords)) {
-      const score = keywords.reduce((sum, keyword) => {
-        return sum + (text.includes(keyword) ? 1 : 0);
-      }, 0);
-      
-      if (score > maxScore) {
-        maxScore = score;
-        bestDomain = domain;
-      }
-    }
-    
-    return bestDomain;
+    return 'general';
   }
 
-  private calculateConfidence(text: string, actionType: string, domain: string): number {
-    let confidence = 0.5; // Base confidence
+  private fastConfidence(text: string, actionType: string, domain: string): number {
+    // Ultra-fast confidence calculation
+    let confidence = 0.7; // Higher base confidence
     
-    // Boost confidence based on keyword matches
-    const actionKeywords = this.actionPatterns[actionType as keyof typeof this.actionPatterns] || [];
-    const actionMatches = actionKeywords.filter(keyword => text.includes(keyword)).length;
-    confidence += actionMatches * 0.1;
+    if (domain !== 'general') confidence += 0.2;
+    if (text.length > 10) confidence += 0.1;
     
-    if (domain !== 'general') {
-      const domainKeywords = this.domainKeywords[domain as keyof typeof this.domainKeywords] || [];
-      const domainMatches = domainKeywords.filter(keyword => text.includes(keyword)).length;
-      confidence += domainMatches * 0.15;
-    }
+    return Math.min(confidence, 0.95);
+  }
+  
+  private getCachedSuggestion(actionType: string, domain: string): string {
+    // Pre-cached suggestions for instant response
+    const suggestions = {
+      'create_programming': 'Create new coding project',
+      'create_fitness': 'Create workout plan',
+      'create_cooking': 'Create recipe plan',
+      'learn_programming': 'Start coding tutorial',
+      'learn_fitness': 'Learn exercise techniques',
+      'schedule_general': 'Schedule new event',
+      'communicate_general': 'Send message',
+      'analyze_general': 'Analyze information',
+      'organize_general': 'Organize content'
+    };
     
-    return Math.min(confidence, 1.0);
+    const key = `${actionType}_${domain}`;
+    return suggestions[key as keyof typeof suggestions] || `${actionType} ${domain} content`;
   }
 
   private generateSuggestion(actionType: string, domain: string, originalText: string): string {

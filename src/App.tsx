@@ -102,11 +102,25 @@ function App() {
     }
   }, [cognitiveEngine, preferences]);
 
-  // Debounced input processing
+  // Ultra-fast input processing with instant feedback
   useEffect(() => {
+    if (!userInput.trim()) {
+      setCurrentIntent(null);
+      return;
+    }
+    
+    // Instant response for short inputs
+    if (userInput.length < 10) {
+      const timeoutId = setTimeout(() => {
+        processInput(userInput);
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+    
+    // Slightly delayed for longer inputs
     const timeoutId = setTimeout(() => {
       processInput(userInput);
-    }, 300);
+    }, 200);
 
     return () => clearTimeout(timeoutId);
   }, [userInput, processInput]);
