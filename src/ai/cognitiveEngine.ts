@@ -1,15 +1,18 @@
 import { IntentClassifier } from './intentClassifier';
 import { EntityExtractor } from './entityExtractor';
+import { UniversalClassifier } from './universalClassifier';
 import { Intent, UserPreferences, IntentHistoryEntry } from '../types';
 
 export class CognitiveEngine {
   private intentClassifier: IntentClassifier;
   private entityExtractor: EntityExtractor;
+  private universalClassifier: UniversalClassifier;
   private isInitialized = false;
 
   constructor() {
     this.intentClassifier = new IntentClassifier();
     this.entityExtractor = new EntityExtractor();
+    this.universalClassifier = new UniversalClassifier();
   }
 
   async initialize(): Promise<void> {
@@ -39,9 +42,21 @@ export class CognitiveEngine {
       const entities = this.entityExtractor.extractEntities(text);
       console.log('🏷️ Entities extracted:', entities);
       
-      // Classify intent with entity context
-      const intent = await this.intentClassifier.classifyIntent(text, entities);
-      console.log('🎯 Intent classified:', intent);
+      // Use universal classifier for infinite domain coverage
+      const universalAction = this.universalClassifier.classifyUniversalIntent(text, entities);
+      
+      // Convert to Intent format
+      const intent: Intent = {
+        category: universalAction.actionType,
+        confidence: universalAction.confidence,
+        suggestion: universalAction.suggestion,
+        action: universalAction.action,
+        icon: universalAction.icon,
+        entities,
+        domain: universalAction.domain
+      };
+      
+      console.log(`🎯 Universal classification: ${universalAction.actionType} in ${universalAction.domain} domain`);
       
       return intent;
     } catch (error) {

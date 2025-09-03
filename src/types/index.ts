@@ -5,6 +5,7 @@ export interface Intent {
   action: string;
   icon: string;
   entities?: ExtractedEntity[];
+  domain?: string;
 }
 
 export interface ExtractedEntity {

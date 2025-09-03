@@ -9,7 +9,7 @@ import TestingPanel from './components/TestingPanel';
 import VoiceInput from './components/VoiceInput';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import PWAInstaller from './components/PWAInstaller';
-import { ActionExecutor } from './actions/ActionExecutor';
+import { UniversalActionExecutor } from './actions/UniversalActionExecutor';
 import { ContextEngine } from './ai/contextEngine';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
   const [showConfirmation, setShowConfirmation] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [cognitiveEngine] = useState(() => new CognitiveEngine());
-  const [actionExecutor] = useState(() => new ActionExecutor());
+  const [actionExecutor] = useState(() => new UniversalActionExecutor());
   const [contextEngine] = useState(() => new ContextEngine());
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [contextualSuggestions, setContextualSuggestions] = useState<string[]>([]);
@@ -118,7 +118,7 @@ function App() {
       
       try {
         // Execute the actual action
-        const result = await actionExecutor.executeAction(currentIntent, userInput);
+        const result = await actionExecutor.executeUniversalAction(currentIntent, userInput);
         
         if (result.success) {
           setShowConfirmation(result.message);
