@@ -9,7 +9,7 @@ import TestingPanel from './components/TestingPanel';
 import VoiceInput from './components/VoiceInput';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import PWAInstaller from './components/PWAInstaller';
-import ResourceUsageInfo from './components/ResourceUsageInfo';
+
 import PerformanceWarning from './components/PerformanceWarning';
 import { UniversalActionExecutor } from './actions/UniversalActionExecutor';
 import { ContextEngine } from './ai/contextEngine';
@@ -324,15 +324,7 @@ function App() {
             )}
           </div>
 
-          {/* Insights Panel */}
-          <div className="lg:col-span-1 space-y-6">
-            <InsightsPanel 
-              preferences={preferences} 
-              insights={insights} 
-              proactiveSuggestions={proactiveSuggestions}
-            />
 
-          </div>
         </div>
 
         {/* Contextual Suggestions */}
