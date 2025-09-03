@@ -6,6 +6,7 @@ export interface Intent {
   icon: string;
   entities?: ExtractedEntity[];
   domain?: string;
+  aiResponse?: string;
 }
 
 export interface ExtractedEntity {

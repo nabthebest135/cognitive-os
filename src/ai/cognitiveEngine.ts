@@ -1,18 +1,21 @@
 import { IntentClassifier } from './intentClassifier';
 import { EntityExtractor } from './entityExtractor';
 import { UniversalClassifier } from './universalClassifier';
+import { LocalAI } from './localAI';
 import { Intent, UserPreferences, IntentHistoryEntry } from '../types';
 
 export class CognitiveEngine {
   private intentClassifier: IntentClassifier;
   private entityExtractor: EntityExtractor;
   private universalClassifier: UniversalClassifier;
+  private localAI: LocalAI;
   private isInitialized = false;
 
   constructor() {
     this.intentClassifier = new IntentClassifier();
     this.entityExtractor = new EntityExtractor();
     this.universalClassifier = new UniversalClassifier();
+    this.localAI = new LocalAI();
   }
 
   async initialize(): Promise<void> {
@@ -36,22 +39,26 @@ export class CognitiveEngine {
       // Extract entities first
       const entities = this.entityExtractor.extractEntities(text);
       
-      // Use ONLY universal classifier (bypass slow TensorFlow)
+      // Use Local AI for intelligent responses
+      const aiResponse = await this.localAI.generateResponse(text);
+      
+      // Use universal classifier for action type
       const universalAction = this.universalClassifier.classifyUniversalIntent(text, entities);
       
-      // Convert to Intent format
+      // Convert to Intent format with AI-generated content
       const intent: Intent = {
         category: universalAction.actionType,
-        confidence: universalAction.confidence,
-        suggestion: universalAction.suggestion,
-        action: universalAction.action,
+        confidence: 0.95, // High confidence with AI
+        suggestion: 'Download',
+        action: `🧠 AI Response: ${aiResponse}`,
         icon: universalAction.icon,
         entities,
-        domain: universalAction.domain
+        domain: universalAction.domain,
+        aiResponse // Store AI response for download
       };
       
       const endTime = performance.now();
-      console.log(`⚡ INSTANT: ${(endTime - startTime).toFixed(1)}ms - ${universalAction.actionType} in ${universalAction.domain}`);
+      console.log(`🧠 AI Response: ${(endTime - startTime).toFixed(1)}ms`);
       
       return intent;
     } catch (error) {
