@@ -12,6 +12,7 @@ import PWAInstaller from './components/PWAInstaller';
 
 import PerformanceWarning from './components/PerformanceWarning';
 import TrainingDataPanel from './components/TrainingDataPanel';
+import { CognitiveMirror } from './ai/cognitiveMirror';
 import { UniversalActionExecutor } from './actions/UniversalActionExecutor';
 import { ContextEngine } from './ai/contextEngine';
 
@@ -23,6 +24,7 @@ function App() {
   const [cognitiveEngine] = useState(() => new CognitiveEngine());
   const [actionExecutor] = useState(() => new UniversalActionExecutor());
   const [contextEngine] = useState(() => new ContextEngine());
+  const [cognitiveMirror] = useState(() => new CognitiveMirror());
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [contextualSuggestions, setContextualSuggestions] = useState<string[]>([]);
   const [preferences, setPreferences] = useState<UserPreferences>({ 
@@ -46,10 +48,14 @@ function App() {
     }
   }, []);
 
-  // Initialize cognitive engine
+  // Initialize cognitive engine and mirror
   useEffect(() => {
     cognitiveEngine.initialize();
-  }, [cognitiveEngine]);
+    cognitiveMirror.initialize();
+    
+    // Make mirror globally accessible for predictions
+    (window as any).cognitiveMirror = cognitiveMirror;
+  }, [cognitiveEngine, cognitiveMirror]);
 
   // Save preferences to localStorage
   const savePreferences = useCallback((newPrefs: UserPreferences) => {
@@ -198,6 +204,19 @@ function App() {
               >
                 📊 Analytics
               </button>
+              <button
+                onClick={() => {
+                  const isActive = cognitiveMirror.getCurrentPredictions().length > 0;
+                  if (isActive) {
+                    alert('🪞 Cognitive Mirror is watching your activity and making predictions!');
+                  } else {
+                    alert('🪞 Cognitive Mirror is ready. Start browsing and it will predict your needs!');
+                  }
+                }}
+                className="bg-cyan-600/30 hover:bg-cyan-600/50 border border-cyan-400/30 text-cyan-200 px-4 py-2 rounded-lg transition-colors text-sm"
+              >
+                🪞 Mirror
+              </button>
             </div>
           </div>
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -212,6 +231,9 @@ function App() {
           </p>
           <p className="text-green-400/50 text-sm mt-2">
             A proactive AI layer that learns your intentions and suggests actions before you ask
+          </p>
+          <p className="text-cyan-400/60 text-xs mt-1">
+            🪞 <strong>NEW:</strong> Cognitive Mirror watches your activity and predicts what you need next
           </p>
           <div className="flex items-center justify-center gap-4 mt-4 text-sm text-green-400/60">
             <span className="flex items-center gap-1">

@@ -141,8 +141,38 @@ export class LocalAI {
   exportTrainingData(): string { return '[]'; }
   clearTrainingData(): void { }
 
-  private smartFallback(input: string): string {
-    return `AI service temporarily unavailable. Please try again.`;
+  private generateActionableResponse(input: string): string {
+    const lower = input.toLowerCase();
+    
+    // UNIQUE: Focus on ACTIONS users can take, not just information
+    
+    // Code requests → Downloadable working code
+    if (lower.includes('python') || lower.includes('javascript') || lower.includes('code')) {
+      return `I'll create a working code file for you to download and run immediately.`;
+    }
+    
+    // Study requests → Complete study system with resources
+    if (lower.includes('study') || lower.includes('learn') || lower.includes('exam')) {
+      return `I'll generate a complete study plan with downloadable resources and practice materials.`;
+    }
+    
+    // Meeting/schedule → Actual calendar files
+    if (lower.includes('meeting') || lower.includes('schedule') || lower.includes('calendar')) {
+      return `I'll create a calendar event file (.ics) you can import directly into your calendar app.`;
+    }
+    
+    // Email requests → Open actual email client
+    if (lower.includes('email') || lower.includes('message') || lower.includes('contact')) {
+      return `I'll open a pre-written email draft in your default email client.`;
+    }
+    
+    // Design/creative → Structured creative briefs
+    if (lower.includes('design') || lower.includes('create') || lower.includes('build')) {
+      return `I'll generate a complete project brief with timeline, resources, and actionable steps.`;
+    }
+    
+    // Default: Action-oriented response
+    return `I'll analyze your request and create downloadable resources to help you take immediate action.`;
   }
 
   private extractTopic(input: string): string {
