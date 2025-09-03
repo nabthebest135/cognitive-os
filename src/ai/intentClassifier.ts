@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import { Intent, ExtractedEntity } from '../types';
+import { TRAINING_DATA, INTENT_LABELS, LABEL_TO_INDEX } from './trainingData';
 
 export class IntentClassifier {
   private model: tf.LayersModel | null = null;
@@ -11,11 +12,15 @@ export class IntentClassifier {
     if (this.isInitialized) return;
 
     try {
-      // Create a simple neural network for intent classification
+      // Create an advanced neural network for intent classification
       this.model = tf.sequential({
         layers: [
-          tf.layers.dense({ inputShape: [100], units: 64, activation: 'relu' }),
+          tf.layers.dense({ inputShape: [200], units: 128, activation: 'relu' }),
+          tf.layers.batchNormalization(),
           tf.layers.dropout({ rate: 0.3 }),
+          tf.layers.dense({ units: 64, activation: 'relu' }),
+          tf.layers.batchNormalization(),
+          tf.layers.dropout({ rate: 0.2 }),
           tf.layers.dense({ units: 32, activation: 'relu' }),
           tf.layers.dense({ units: this.intentLabels.length, activation: 'softmax' })
         ]
@@ -77,14 +82,26 @@ export class IntentClassifier {
 
   private textToFeatures(text: string): tf.Tensor {
     const words = text.toLowerCase().split(/\s+/);
-    const features = new Array(100).fill(0);
+    const features = new Array(200).fill(0);
     
+    // Word presence features
     words.forEach(word => {
       const index = this.vocabulary.get(word);
-      if (index !== undefined && index < 100) {
+      if (index !== undefined && index < 150) {
         features[index] = 1;
       }
     });
+    
+    // Additional features
+    features[150] = words.length; // Text length
+    features[151] = words.filter(w => w.includes('email')).length; // Email mentions
+    features[152] = words.filter(w => w.includes('schedule')).length; // Schedule mentions
+    features[153] = words.filter(w => w.includes('code')).length; // Code mentions
+    features[154] = words.filter(w => w.includes('study')).length; // Study mentions
+    features[155] = words.filter(w => w.includes('design')).length; // Design mentions
+    
+    // Normalize length feature
+    features[150] = Math.min(features[150] / 10, 1);
 
     return tf.tensor2d([features]);
   }
@@ -239,89 +256,78 @@ export class IntentClassifier {
 
   private initializeVocabulary(): void {
     const commonWords = [
-      // Planning words
+      // Planning words (0-29)
       'plan', 'schedule', 'meeting', 'calendar', 'appointment', 'event', 'remind', 'deadline',
       'tomorrow', 'today', 'next', 'week', 'month', 'time', 'date', 'when', 'where',
+      'book', 'organize', 'set', 'arrange', 'prepare', 'coordinate', 'manage', 'timeline',
+      'agenda', 'venue', 'reservation', 'booking', 'session',
       
-      // Coding words
+      // Coding words (30-59)
       'code', 'project', 'github', 'programming', 'develop', 'build', 'debug', 'deploy',
       'function', 'class', 'variable', 'api', 'database', 'frontend', 'backend', 'framework',
+      'react', 'javascript', 'python', 'typescript', 'node', 'docker', 'kubernetes', 'git',
+      'repository', 'commit', 'branch', 'merge', 'pull', 'push',
       
-      // Research words
+      // Research words (60-89)
       'research', 'paper', 'notes', 'study', 'learn', 'document', 'analyze', 'investigate',
       'article', 'book', 'source', 'reference', 'data', 'information', 'knowledge',
+      'exam', 'test', 'quiz', 'homework', 'assignment', 'thesis', 'dissertation', 'report',
+      'analysis', 'survey', 'experiment', 'observation', 'findings', 'conclusion', 'theory',
       
-      // Communication words
+      // Communication words (90-119)
       'email', 'message', 'call', 'contact', 'reach', 'follow', 'discuss', 'talk',
       'send', 'reply', 'respond', 'communicate', 'chat', 'conversation', 'notify',
       'inform', 'update', 'team', 'client', 'manager', 'about', 'regarding',
+      'newsletter', 'announcement', 'feedback', 'proposal', 'invoice', 'reminder', 'alert', 'notice',
       
-      // Creative words
+      // Creative words (120-149)
       'design', 'create', 'write', 'draft', 'brainstorm', 'ideate', 'sketch', 'imagine',
-      'concept', 'idea', 'inspiration', 'creative', 'art', 'story', 'content'
+      'concept', 'idea', 'inspiration', 'creative', 'art', 'story', 'content',
+      'logo', 'brand', 'marketing', 'campaign', 'poster', 'flyer', 'brochure', 'website',
+      'mockup', 'prototype', 'wireframe', 'layout', 'graphics', 'illustration', 'animation', 'video'
     ];
 
     commonWords.forEach((word, index) => {
       this.vocabulary.set(word, index);
     });
+    
+    console.log(`📚 Vocabulary initialized with ${commonWords.length} words`);
   }
 
   private async trainWithSyntheticData(): Promise<void> {
     if (!this.model) return;
 
-    // Create synthetic training data
-    const trainingData = [
-      // Planning examples
-      { text: 'schedule meeting with john tomorrow', intent: 0 },
-      { text: 'plan vacation next month', intent: 0 },
-      { text: 'remind me to call mom', intent: 0 },
-      { text: 'set deadline for project', intent: 0 },
-      
-      // Coding examples
-      { text: 'debug the api function', intent: 1 },
-      { text: 'create new react project', intent: 1 },
-      { text: 'deploy to github pages', intent: 1 },
-      { text: 'build the frontend', intent: 1 },
-      
-      // Research examples
-      { text: 'research machine learning papers', intent: 2 },
-      { text: 'study quantum computing', intent: 2 },
-      { text: 'analyze market data', intent: 2 },
-      { text: 'investigate new framework', intent: 2 },
-      
-      // Communication examples
-      { text: 'email the client about updates', intent: 3 },
-      { text: 'email team about project updates', intent: 3 },
-      { text: 'call sarah about the meeting', intent: 3 },
-      { text: 'follow up with the team', intent: 3 },
-      { text: 'send message to support', intent: 3 },
-      { text: 'notify manager about progress', intent: 3 },
-      { text: 'inform client of changes', intent: 3 },
-      { text: 'update team on status', intent: 3 },
-      
-      // Creative examples
-      { text: 'design new logo concept', intent: 4 },
-      { text: 'write blog post about ai', intent: 4 },
-      { text: 'brainstorm app ideas', intent: 4 },
-      { text: 'sketch user interface', intent: 4 }
-    ];
-
-    const xs = trainingData.map(item => this.textToFeatures(item.text));
-    const ys = trainingData.map(item => {
+    console.log('🎤 Training advanced model with 250 examples...');
+    
+    // Use comprehensive training data
+    const xs = TRAINING_DATA.map(item => this.textToFeatures(item.text));
+    const ys = TRAINING_DATA.map(item => {
       const label = new Array(this.intentLabels.length).fill(0);
-      label[item.intent] = 1;
+      const intentIndex = LABEL_TO_INDEX[item.intent as keyof typeof LABEL_TO_INDEX];
+      label[intentIndex] = 1;
       return label;
     });
 
     const xsTensor = tf.stack(xs.map(x => x.squeeze()));
     const ysTensor = tf.tensor2d(ys);
 
-    // Train the model
+    // Train the model with better parameters
     await this.model.fit(xsTensor, ysTensor, {
-      epochs: 50,
-      batchSize: 4,
-      verbose: 0
+      epochs: 100,
+      batchSize: 8,
+      validationSplit: 0.2,
+      shuffle: true,
+      verbose: 0,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          if (epoch % 20 === 0) {
+            console.log(`🎤 Training epoch ${epoch}: accuracy = ${(logs?.acc * 100).toFixed(1)}%`);
+          }
+        }
+      }
     });
+
+    console.log('✅ Model training completed with 250 examples!');
 
     // Clean up tensors
     xs.forEach(x => x.dispose());
