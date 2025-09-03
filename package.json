@@ -1,8 +1,10 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "cognitive-os",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "author": "nabthebest135",
+  "description": "The world's first privacy-first proactive AI that runs entirely in your browser",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
