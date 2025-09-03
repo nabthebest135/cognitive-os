@@ -6,7 +6,11 @@ import IntentDisplay from './components/IntentDisplay';
 import InsightsPanel from './components/InsightsPanel';
 import DemoMode from './components/DemoMode';
 import TestingPanel from './components/TestingPanel';
+import VoiceInput from './components/VoiceInput';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
+import PWAInstaller from './components/PWAInstaller';
 import { ActionExecutor } from './actions/ActionExecutor';
+import { ContextEngine } from './ai/contextEngine';
 
 function App() {
   const [userInput, setUserInput] = useState('');
@@ -15,6 +19,9 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cognitiveEngine] = useState(() => new CognitiveEngine());
   const [actionExecutor] = useState(() => new ActionExecutor());
+  const [contextEngine] = useState(() => new ContextEngine());
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [contextualSuggestions, setContextualSuggestions] = useState<string[]>([]);
   const [preferences, setPreferences] = useState<UserPreferences>({ 
     intentHistory: [], 
     lastActivity: '',
@@ -64,8 +71,21 @@ function App() {
       const endTime = performance.now();
       const processingDuration = Math.round(endTime - startTime);
       
-      console.log('✅ Intent processed:', intent);
-      setCurrentIntent(intent);
+      if (intent) {
+        // Update context and get enhancements
+        contextEngine.updateContext(text, intent);
+        const enhancements = contextEngine.getSmartDefaults(intent);
+        const enhancedIntent = { ...intent, ...enhancements };
+        
+        // Update contextual suggestions
+        setContextualSuggestions(contextEngine.getContextualSuggestions());
+        
+        console.log('✅ Intent processed:', enhancedIntent);
+        setCurrentIntent(enhancedIntent);
+      } else {
+        setCurrentIntent(null);
+      }
+      
       setProcessingTime(processingDuration);
       
       // Update insights and proactive suggestions
@@ -149,6 +169,17 @@ function App() {
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <PWAInstaller />
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowAnalytics(true)}
+                className="bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/30 text-purple-200 px-4 py-2 rounded-lg transition-colors text-sm"
+              >
+                📊 Analytics
+              </button>
+            </div>
+          </div>
           <div className="flex items-center justify-center gap-3 mb-4">
             <Brain className="w-10 h-10 text-cyan-400 animate-pulse" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-green-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
@@ -211,6 +242,13 @@ function App() {
                   autoFocus
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                  <VoiceInput 
+                    onVoiceInput={(text) => {
+                      setUserInput(text);
+                      processInput(text);
+                    }}
+                    isProcessing={isProcessing}
+                  />
                   {(userInput || isProcessing) && (
                     <Zap className={`w-5 h-5 text-yellow-400 ${isProcessing ? 'animate-spin' : 'animate-pulse'}`} />
                   )}
@@ -269,19 +307,46 @@ function App() {
           </div>
         </div>
 
+        {/* Contextual Suggestions */}
+        {contextualSuggestions.length > 0 && (
+          <div className="mt-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-400/20 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-300 mb-4 flex items-center gap-2">
+              🧠 Smart Suggestions Based on Your Patterns
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {contextualSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setUserInput(suggestion);
+                    processInput(suggestion);
+                  }}
+                  className="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-400/30 text-blue-200 px-4 py-2 rounded-lg transition-colors text-sm text-left"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="text-center mt-12 text-green-400/40">
           <p className="flex items-center justify-center gap-2">
             <Brain className="w-4 h-4" />
-            Cognitive OS - The Future of Personal AI | Powered by TensorFlow.js & Compromise.js
+            Cognitive OS - The Future of Personal AI | Powered by TensorFlow.js & Advanced Context Engine
           </p>
           <p className="text-xs mt-2">
-            Proactive Intelligence • Zero Server Dependency • Complete Privacy
+            Proactive Intelligence • Voice Commands • Context Awareness • Complete Privacy
           </p>
         </div>
       </div>
 
-
+      {/* Analytics Dashboard */}
+      <AnalyticsDashboard 
+        isVisible={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+      />
     </div>
   );
 }
