@@ -96,7 +96,7 @@ export class IntentClassifier {
     const planningKeywords = ['plan', 'schedule', 'meeting', 'calendar', 'appointment', 'event', 'remind', 'deadline'];
     const codingKeywords = ['code', 'project', 'github', 'programming', 'develop', 'build', 'debug', 'deploy'];
     const researchKeywords = ['research', 'paper', 'notes', 'study', 'learn', 'document', 'analyze', 'investigate'];
-    const communicationKeywords = ['email', 'message', 'call', 'contact', 'reach out', 'follow up', 'discuss'];
+    const communicationKeywords = ['email', 'message', 'call', 'contact', 'reach', 'follow', 'discuss', 'send', 'notify', 'inform', 'update', 'team', 'client', 'manager'];
     const creativeKeywords = ['design', 'create', 'write', 'draft', 'brainstorm', 'ideate', 'sketch'];
 
     // Calculate scores based on keywords and entities
@@ -253,7 +253,8 @@ export class IntentClassifier {
       
       // Communication words
       'email', 'message', 'call', 'contact', 'reach', 'follow', 'discuss', 'talk',
-      'send', 'reply', 'respond', 'communicate', 'chat', 'conversation',
+      'send', 'reply', 'respond', 'communicate', 'chat', 'conversation', 'notify',
+      'inform', 'update', 'team', 'client', 'manager', 'about', 'regarding',
       
       // Creative words
       'design', 'create', 'write', 'draft', 'brainstorm', 'ideate', 'sketch', 'imagine',
@@ -290,9 +291,13 @@ export class IntentClassifier {
       
       // Communication examples
       { text: 'email the client about updates', intent: 3 },
+      { text: 'email team about project updates', intent: 3 },
       { text: 'call sarah about the meeting', intent: 3 },
       { text: 'follow up with the team', intent: 3 },
       { text: 'send message to support', intent: 3 },
+      { text: 'notify manager about progress', intent: 3 },
+      { text: 'inform client of changes', intent: 3 },
+      { text: 'update team on status', intent: 3 },
       
       // Creative examples
       { text: 'design new logo concept', intent: 4 },
