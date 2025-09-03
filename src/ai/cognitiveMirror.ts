@@ -92,101 +92,57 @@ export class CognitiveMirror {
   private async analyzeContext(context: string): Promise<void> {
     console.log('🪞 Context detected:', context);
     
-    // Use AI to analyze context and generate better predictions
-    const aiPredictions = await this.getAIPredictions(context);
-    const rulePredictions = this.predictNeeds(context);
-    
-    // Combine AI and rule-based predictions
-    const allPredictions = [...new Set([...aiPredictions, ...rulePredictions])];
-    this.predictions = allPredictions;
+    // Generate predictions based on context
+    const predictions = this.predictNeeds(context);
+    this.predictions = predictions;
     
     // Trigger proactive suggestions
-    if (allPredictions.length > 0) {
-      this.triggerProactiveSuggestions(allPredictions);
+    if (predictions.length > 0) {
+      this.triggerProactiveSuggestions(predictions);
     }
   }
 
-  private async getAIPredictions(context: string): Promise<string[]> {
-    try {
-      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-large', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_HF_API_KEY || 'hf_demo'}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          inputs: `Based on this context: "${context}", what would the user likely need next? Suggest 3 specific actions.`,
-          parameters: {
-            max_new_tokens: 100,
-            temperature: 0.7
-          }
-        })
-      });
 
-      if (response.ok) {
-        const data = await response.json();
-        const aiResponse = data[0]?.generated_text || '';
-        
-        // Extract actionable suggestions from AI response
-        return this.extractActionsFromAI(aiResponse);
-      }
-    } catch (error) {
-      console.warn('AI prediction failed:', error);
-    }
-    
-    return [];
-  }
-
-  private extractActionsFromAI(aiResponse: string): string[] {
-    // Extract actionable items from AI response
-    const actions: string[] = [];
-    
-    if (aiResponse.includes('template')) actions.push('Generate templates');
-    if (aiResponse.includes('plan')) actions.push('Create action plan');
-    if (aiResponse.includes('guide')) actions.push('Download guide');
-    if (aiResponse.includes('checklist')) actions.push('Create checklist');
-    if (aiResponse.includes('notes')) actions.push('Generate notes');
-    
-    return actions.slice(0, 3); // Max 3 suggestions
-  }
 
   private predictNeeds(context: string): string[] {
     const lower = context.toLowerCase();
     const predictions: string[] = [];
 
-    // Coding context
-    if (lower.includes('github') || lower.includes('vscode') || lower.includes('code')) {
+    // Gmail/Email context
+    if (lower.includes('gmail') || lower.includes('mail') || lower.includes('inbox')) {
+      predictions.push('Generate email templates');
+      predictions.push('Create meeting agenda');
+      predictions.push('Setup calendar invite');
+    }
+    // GitHub/Coding context
+    else if (lower.includes('github') || lower.includes('code') || lower.includes('repository')) {
       predictions.push('Generate code templates');
       predictions.push('Create debugging checklist');
       predictions.push('Setup deployment guide');
     }
-
-    // Research context
-    if (lower.includes('wikipedia') || lower.includes('research') || lower.includes('study')) {
+    // Wikipedia/Research context
+    else if (lower.includes('wikipedia') || lower.includes('research') || lower.includes('study')) {
       predictions.push('Create study plan');
       predictions.push('Generate summary notes');
       predictions.push('Find related resources');
     }
-
-    // Email context
-    if (lower.includes('gmail') || lower.includes('email') || lower.includes('mail')) {
-      predictions.push('Create email templates');
-      predictions.push('Generate meeting agenda');
-      predictions.push('Setup calendar invite');
+    // YouTube/Learning context
+    else if (lower.includes('youtube') || lower.includes('tutorial') || lower.includes('learn')) {
+      predictions.push('Create learning notes');
+      predictions.push('Generate practice exercises');
+      predictions.push('Build progress tracker');
     }
-
     // Shopping context
-    if (lower.includes('amazon') || lower.includes('shop') || lower.includes('buy')) {
+    else if (lower.includes('amazon') || lower.includes('shop') || lower.includes('buy')) {
       predictions.push('Create comparison chart');
       predictions.push('Generate budget tracker');
       predictions.push('Find better deals');
     }
-
-    // Learning context
-    if (lower.includes('youtube') || lower.includes('tutorial') || lower.includes('learn')) {
-      predictions.push('Create learning notes');
-      predictions.push('Generate practice exercises');
-      predictions.push('Build progress tracker');
+    // Default for any other context
+    else {
+      predictions.push('Generate helpful content');
+      predictions.push('Create action plan');
+      predictions.push('Download resources');
     }
 
     return predictions;
