@@ -214,6 +214,9 @@ export default function AnalyticsDashboard({ isVisible, onClose }: AnalyticsDash
           <p className="text-sm text-gray-400">
             🧠 Your cognitive patterns are helping shape the future of AI interaction
           </p>
+          <p className="text-xs text-gray-500 mt-2">
+            Built by Nabhan - 15-year-old AI innovator
+          </p>
         </div>
       </div>
     </div>

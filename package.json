@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "author": "nabthebest135",
+  "author": "Nabhan (@nabthebest135)",
   "description": "The world's first privacy-first proactive AI that runs entirely in your browser",
   "scripts": {
     "dev": "vite",

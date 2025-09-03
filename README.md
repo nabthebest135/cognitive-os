@@ -1,6 +1,6 @@
 # 🧠 Cognitive OS - The World's First Privacy-First Proactive AI
 
-> **Built by a 15-year-old** | **100% Local Processing** | **Zero Data Collection**
+> **Built by Nabhan (15 years old)** | **100% Local Processing** | **Zero Data Collection**
 
 A revolutionary proof-of-concept that demonstrates the future of human-computer interaction through proactive AI that learns your intentions and suggests actions before you ask.
 
@@ -155,12 +155,14 @@ This Cognitive OS represents the first step toward truly intelligent computing�
 
 ---
 
-## 🏆 Built by a 15-Year-Old
+## 🏆 Built by Nabhan
 
-This project demonstrates that age is no barrier to innovation. The future of AI is being built by the next generation.
+**15-year-old AI innovator** demonstrating that age is no barrier to building revolutionary technology. The future of AI is being created by the next generation.
 
-**Connect**: [Your social media links]
+**Connect with Nabhan:**
+- GitHub: [@nabthebest135](https://github.com/nabthebest135)
+- Project: [Cognitive OS](https://nabthebest135.github.io/cognitive-os)
 
 ---
 
-*Built with ❤️ using TensorFlow.js, React, and the vision of truly intelligent computing.*
+*Built with ❤️ by Nabhan using TensorFlow.js, React, and the vision of truly intelligent computing.*

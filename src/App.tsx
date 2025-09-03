@@ -334,10 +334,13 @@ function App() {
         <div className="text-center mt-12 text-green-400/40">
           <p className="flex items-center justify-center gap-2">
             <Brain className="w-4 h-4" />
-            Cognitive OS - The Future of Personal AI | Powered by TensorFlow.js & Advanced Context Engine
+            Cognitive OS - The Future of Personal AI | Built by Nabhan
           </p>
           <p className="text-xs mt-2">
             Proactive Intelligence • Voice Commands • Context Awareness • Complete Privacy
+          </p>
+          <p className="text-xs mt-1 text-green-400/30">
+            Powered by TensorFlow.js & Advanced Context Engine
           </p>
         </div>
       </div>
