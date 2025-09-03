@@ -10,6 +10,7 @@ import VoiceInput from './components/VoiceInput';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import PWAInstaller from './components/PWAInstaller';
 import ResourceUsageInfo from './components/ResourceUsageInfo';
+import PerformanceWarning from './components/PerformanceWarning';
 import { UniversalActionExecutor } from './actions/UniversalActionExecutor';
 import { ContextEngine } from './ai/contextEngine';
 
@@ -103,28 +104,27 @@ function App() {
     }
   }, [cognitiveEngine, preferences]);
 
-  // Ultra-fast input processing with instant feedback
+  // Performance-safe input processing
   useEffect(() => {
     if (!userInput.trim()) {
       setCurrentIntent(null);
       return;
     }
     
-    // Instant response for short inputs
-    if (userInput.length < 10) {
-      const timeoutId = setTimeout(() => {
-        processInput(userInput);
-      }, 100);
-      return () => clearTimeout(timeoutId);
+    // Prevent processing if already processing
+    if (isProcessing) {
+      return;
     }
     
-    // Slightly delayed for longer inputs
+    // Throttle processing to prevent resource overload
     const timeoutId = setTimeout(() => {
-      processInput(userInput);
-    }, 200);
+      if (!isProcessing) {
+        processInput(userInput);
+      }
+    }, 500); // Increased delay for stability
 
     return () => clearTimeout(timeoutId);
-  }, [userInput, processInput]);
+  }, [userInput, processInput, isProcessing]);
 
   // Handle suggestion click
   const handleSuggestionClick = async () => {
@@ -224,6 +224,7 @@ function App() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Interface */}
           <div className="lg:col-span-2 space-y-6">
+            <PerformanceWarning />
             {/* Demo Mode */}
             {/* Demo Mode - Make it more prominent */}
             <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-400/30 rounded-lg p-6 mb-6">

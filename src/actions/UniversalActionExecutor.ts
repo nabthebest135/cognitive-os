@@ -1,6 +1,13 @@
 import { Intent } from '../types';
 import { ActionResult } from './ActionExecutor';
 
+interface PendingDownload {
+  content: string;
+  filename: string;
+  mimeType: string;
+  purpose: string;
+}
+
 export class UniversalActionExecutor {
   async executeUniversalAction(intent: Intent, userInput: string): Promise<ActionResult> {
     const { category: actionType, domain } = intent;
@@ -29,7 +36,7 @@ export class UniversalActionExecutor {
     const content = this.generateCreativeContent(domain, userInput);
     const filename = `${domain}_${this.getActionName(userInput)}.md`;
     
-    this.downloadFile(content, filename, 'text/markdown');
+    this.downloadFile(content, filename, 'text/markdown', `${domain} creation plan and guide`);
     
     return {
       success: true,
@@ -42,7 +49,7 @@ export class UniversalActionExecutor {
     const eventData = this.generateEventData(domain, userInput);
     const icsContent = this.generateICSFile(eventData);
     
-    this.downloadFile(icsContent, `${domain}_event.ics`, 'text/calendar');
+    this.downloadFile(icsContent, `${domain}_event.ics`, 'text/calendar', `Calendar event file for ${domain} scheduling`);
     
     return {
       success: true,
@@ -55,8 +62,8 @@ export class UniversalActionExecutor {
     const studyPlan = this.generateStudyPlan(domain, userInput);
     const resourceFinder = this.generateResourceFinder(domain);
     
-    this.downloadFile(studyPlan, `${domain}_study_plan.md`, 'text/markdown');
-    this.downloadFile(resourceFinder, `${domain}_resources.html`, 'text/html');
+    this.downloadFile(studyPlan, `${domain}_study_plan.md`, 'text/markdown', `Study plan and learning guide for ${domain}`);
+    this.downloadFile(resourceFinder, `${domain}_resources.html`, 'text/html', `Resource finder with links for ${domain} learning`);
     
     return {
       success: true,
@@ -231,7 +238,12 @@ END:VCALENDAR`;
     };
   }
 
-  private downloadFile(content: string, filename: string, mimeType: string): void {
+  private downloadFile(content: string, filename: string, mimeType: string, purpose?: string): void {
+    // Show what's being downloaded
+    console.log(`📁 Preparing download: ${filename}`);
+    console.log(`📝 Purpose: ${purpose || 'Generated content'}`);
+    console.log(`📄 Type: ${mimeType}`);
+    
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -241,6 +253,7 @@ END:VCALENDAR`;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    console.log(`📁 Downloaded: ${filename}`);
+    
+    console.log(`✅ Downloaded: ${filename} - ${purpose || 'Generated content'}`);
   }
 }
