@@ -17,14 +17,26 @@ export class CognitiveMirror {
     // Immediate context analysis
     this.analyzeContext(`${document.title} ${window.location.href}`);
     
-    // Fast URL monitoring (every 100ms for responsiveness)
+    // Ultra-fast monitoring (every 50ms for instant detection)
     setInterval(() => {
       const newContext = `${document.title} ${window.location.href}`;
       if (newContext !== this.currentContext) {
         this.currentContext = newContext;
         this.analyzeContext(newContext);
       }
-    }, 100);
+    }, 50);
+    
+    // Watch for title changes (search results loading)
+    const titleObserver = new MutationObserver(() => {
+      this.analyzeContext(`${document.title} ${window.location.href}`);
+    });
+    
+    if (document.querySelector('title')) {
+      titleObserver.observe(document.querySelector('title')!, {
+        childList: true,
+        subtree: true
+      });
+    }
     
     // Watch for page visibility changes
     document.addEventListener('visibilitychange', () => {
@@ -35,6 +47,11 @@ export class CognitiveMirror {
     
     // Watch for focus changes
     window.addEventListener('focus', () => {
+      this.analyzeContext(`${document.title} ${window.location.href}`);
+    });
+    
+    // Watch for hash changes (single page apps)
+    window.addEventListener('hashchange', () => {
       this.analyzeContext(`${document.title} ${window.location.href}`);
     });
   }
@@ -121,6 +138,14 @@ export class CognitiveMirror {
     const url = window.location.href;
     const title = document.title.toLowerCase();
     
+    // Search query detection (Google, Bing, etc.)
+    if (url.includes('google.com/search') || url.includes('bing.com/search') || url.includes('search')) {
+      const searchTerm = this.extractSearchTerm(url, title);
+      if (searchTerm) {
+        return this.generateSearchBasedPredictions(searchTerm);
+      }
+    }
+    
     // Advanced Gmail context detection
     if (url.includes('gmail') || url.includes('mail.google')) {
       if (title.includes('compose') || url.includes('compose')) {
@@ -186,8 +211,71 @@ export class CognitiveMirror {
       return ['Code solution', 'Debug helper', 'Learning path'];
     }
     
+    // Content-based detection from title
+    if (title.includes('macbook') || title.includes('mac')) {
+      return ['MacBook comparison', 'Specs analyzer', 'Price tracker'];
+    }
+    
+    if (title.includes('iphone') || title.includes('phone')) {
+      return ['Phone comparison', 'Feature analyzer', 'Review summary'];
+    }
+    
     // Default intelligent predictions
     return ['Smart assistant', 'Content generator', 'Productivity booster'];
+  }
+  
+  private extractSearchTerm(url: string, title: string): string {
+    // Extract from URL parameters
+    const urlParams = new URLSearchParams(url.split('?')[1] || '');
+    const query = urlParams.get('q') || urlParams.get('query') || urlParams.get('search');
+    
+    if (query) return query;
+    
+    // Extract from title (Google format: "search term - Google Search")
+    const titleMatch = title.match(/^(.+?)\s*-\s*(google|bing|search)/i);
+    if (titleMatch) return titleMatch[1].trim();
+    
+    return '';
+  }
+  
+  private generateSearchBasedPredictions(searchTerm: string): string[] {
+    const lower = searchTerm.toLowerCase();
+    
+    // Tech products
+    if (lower.includes('macbook') || lower.includes('mac')) {
+      return ['MacBook M4 specs', 'Price comparison', 'Review summary'];
+    }
+    
+    if (lower.includes('iphone')) {
+      return ['iPhone comparison', 'Feature guide', 'Best deals finder'];
+    }
+    
+    if (lower.includes('laptop') || lower.includes('computer')) {
+      return ['Laptop comparison', 'Specs analyzer', 'Buying guide'];
+    }
+    
+    // Programming/coding
+    if (lower.includes('python') || lower.includes('javascript') || lower.includes('code')) {
+      return ['Code examples', 'Tutorial finder', 'Practice exercises'];
+    }
+    
+    // Learning/education
+    if (lower.includes('learn') || lower.includes('tutorial') || lower.includes('course')) {
+      return ['Learning plan', 'Resource finder', 'Progress tracker'];
+    }
+    
+    // Travel
+    if (lower.includes('travel') || lower.includes('flight') || lower.includes('hotel')) {
+      return ['Travel planner', 'Itinerary maker', 'Budget tracker'];
+    }
+    
+    // Health/fitness
+    if (lower.includes('workout') || lower.includes('fitness') || lower.includes('diet')) {
+      return ['Workout plan', 'Progress tracker', 'Meal planner'];
+    }
+    
+    // Generic search
+    return [`${searchTerm} research guide`, `${searchTerm} summary`, `${searchTerm} action plan`];
   }
   
   private extractWikipediaTopic(url: string): string {
