@@ -120,10 +120,14 @@ export class CognitiveMirror {
 
   private async analyzeContext(context: string): Promise<void> {
     console.log('🪞 Context detected:', context);
+    console.log('🪞 URL:', window.location.href);
+    console.log('🪞 Title:', document.title);
     
     // Generate predictions based on context
     const predictions = this.predictNeeds(context);
     this.predictions = predictions;
+    
+    console.log('🪞 Predictions:', predictions);
     
     // Trigger proactive suggestions
     if (predictions.length > 0) {
@@ -180,12 +184,25 @@ export class CognitiveMirror {
     // Advanced YouTube context detection
     if (url.includes('youtube.com')) {
       if (url.includes('/watch')) {
-        return ['Video notes', 'Transcript summary', 'Learning checklist'];
+        // Analyze video title for specific content
+        if (title.includes('macbook') || title.includes('mac')) {
+          return ['MacBook specs guide', 'Price comparison', 'Review summary'];
+        }
+        if (title.includes('iphone') || title.includes('phone')) {
+          return ['iPhone comparison', 'Feature breakdown', 'Buying guide'];
+        }
+        if (title.includes('code') || title.includes('programming') || title.includes('tutorial')) {
+          return ['Code examples', 'Tutorial notes', 'Practice exercises'];
+        }
+        if (title.includes('review') || title.includes('unbox')) {
+          return ['Product comparison', 'Pros & cons list', 'Buying decision'];
+        }
+        return ['Video notes', 'Key points summary', 'Learning checklist'];
       }
       if (url.includes('/playlist')) {
         return ['Course outline', 'Progress tracker', 'Study schedule'];
       }
-      return ['Learning notes', 'Video summary', 'Practice exercises'];
+      return ['Video bookmarks', 'Channel analysis', 'Watch later list'];
     }
     
     // Advanced Amazon context detection
@@ -382,19 +399,45 @@ export class CognitiveMirror {
 
   private getAdvancedContext(): {site: string, activity: string, confidence: number} {
     const url = window.location.href;
-    const title = document.title;
+    const title = document.title.toLowerCase();
+    
+    // YouTube detection with video content analysis
+    if (url.includes('youtube.com')) {
+      if (url.includes('/watch')) {
+        if (title.includes('macbook') || title.includes('mac')) {
+          return {site: 'YouTube', activity: 'MacBook Review/Tutorial', confidence: 95};
+        }
+        if (title.includes('iphone') || title.includes('phone')) {
+          return {site: 'YouTube', activity: 'Phone Review/Tutorial', confidence: 95};
+        }
+        if (title.includes('code') || title.includes('programming')) {
+          return {site: 'YouTube', activity: 'Coding Tutorial', confidence: 95};
+        }
+        return {site: 'YouTube', activity: 'Video Learning', confidence: 90};
+      }
+      return {site: 'YouTube', activity: 'Video Browsing', confidence: 85};
+    }
     
     if (url.includes('gmail')) return {site: 'Gmail', activity: 'Email Management', confidence: 95};
     if (url.includes('github')) return {site: 'GitHub', activity: 'Code Development', confidence: 92};
     if (url.includes('wikipedia')) return {site: 'Wikipedia', activity: 'Research & Learning', confidence: 88};
-    if (url.includes('youtube')) return {site: 'YouTube', activity: 'Video Learning', confidence: 85};
     if (url.includes('amazon')) return {site: 'Amazon', activity: 'Shopping Research', confidence: 82};
+    if (url.includes('google.com/search')) return {site: 'Google', activity: 'Web Search', confidence: 90};
     
     return {site: 'Unknown', activity: 'General Browsing', confidence: 60};
   }
 
   refreshPredictions(): void {
+    console.log('🔄 Refreshing predictions...');
+    
+    // Force context reset
+    this.currentContext = '';
+    
+    // Get fresh context
     const context = `${document.title} ${window.location.href}`;
+    console.log('🔄 Fresh context:', context);
+    
+    // Analyze immediately
     this.analyzeContext(context);
   }
 
