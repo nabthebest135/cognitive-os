@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Cognitive Mirror - AI Context Predictor",
+  "version": "1.0.0",
+  "description": "Revolutionary AI that predicts what you need based on your browsing context",
+  
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage"
+  ],
+  
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Cognitive Mirror"
+  },
+  
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
